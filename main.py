@@ -1,6 +1,7 @@
 import geometry as gm
 import simulator as simu
 import material as mt
+import time
 
 
 def print_hi(name):
@@ -16,9 +17,10 @@ if __name__ == '__main__':
     cell_list = [cell1, cell2]
     geo = gm.Geometry(cell_list)
     mat_list = [mat1, mat2]
-    mode1 = simu.Mode(10000, 50, 30, True)
+    mode1 = simu.Mode(1000, 50, 30, False)
     runner = simu.Simulate(geo, mat_list, mode1)
+
+    t1 = time.time()
     runner.run()
-    print_hi('succeed')
-
-
+    t2 = time.time() - t1
+    print_hi(f'succeed, run in {t2}')

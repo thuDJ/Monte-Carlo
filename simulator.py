@@ -138,16 +138,19 @@ class Simulate:
     def start_batch(self):
         self.k_track = 0
         self.k_absorb = 0
-        loop_num = math.ceil(self.mode.num_ptc / 10)
         threads = []
-        for i in range(self.mode.num_ptc):
-            t = threading.Thread(target=self.ray_tracking, args=(i,))
+        for i in range(10):
+            lst1 = []
+            for j in range(i*100, (i+1)*100):
+                lst1.append(j)
+            t = threading.Thread(target=self.para_track, args=(lst1,))
             threads.append(t)
-        for n in range(loop_num):
-            for i1 in range(n * 10, (n+1) * 10):
-                threads[i1].start()
-            for i1 in range(n * 10, (n+1) * 10):
-                threads[i1].join()
+
+        for i in range(10):
+            threads[i].start()
+        for i in range(10):
+            threads[i].join()
+
         self.k_track = self.k_track / self.mode.num_ptc
         if not self.mode.no_absorb:
             self.k_absorb = self.k_absorb / self.mode.num_ptc
@@ -159,3 +162,7 @@ class Simulate:
 
     def start_count(self):
         self.start_batch()
+
+    def para_track(self, lst):
+        for i in lst:
+            self.ray_tracking(i)
