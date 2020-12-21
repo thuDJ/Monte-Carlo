@@ -17,8 +17,31 @@ class Mode:
 
 
 class Bin:
-    def __init__(self, name):
+    def __init__(self, name, lst):
         self.name = name
+        self.para = lst
+        length = len(lst)
+        self.counts = [0 for i in range(length+1)]
+
+    def count(self, x, sig_t):
+        ll = 0
+        for i in range(len(self.para)):
+            if x < self.para[i]:
+                break
+            ll += 1
+        self.counts[ll] += 1 / sig_t
+
+    def norm(self):
+        max_num = max(self.counts)
+        counts_bk = [self.counts[i]/max_num for i in range(len(self.counts))]
+        self.counts = counts_bk
+
+    def clear(self):
+        self.counts = [0 for i in range(len(self.para)+1)]
+
+    def print(self):
+        print(f"{self.name} counts as: ")
+        print(self.counts)
 
 
 def get_drt():
@@ -38,6 +61,8 @@ class Simulate:
         self.k_track = 0
         self.k_absorb = 0
         self.total_wgt = 0
+        ll = range(-70, 80, 10)
+        self.bin = Bin('flux', ll)
 
     def run(self):
         self.init_source()
@@ -106,6 +131,7 @@ class Simulate:
                     killed = True
 
     def proc_cl(self, ct, mat, pos, wgt):
+        self.bin.count(pos[0], (mat.xs_a+mat.xs_s))
         if not self.mode.no_absorb:
             if ct == 1:
                 # 裂变
@@ -148,4 +174,8 @@ class Simulate:
         self.init_source()
 
     def start_count(self):
+        self.bin.clear()
         self.start_batch()
+        self.bin.norm()
+        self.bin.print()
+
