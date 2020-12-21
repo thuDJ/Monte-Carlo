@@ -1,5 +1,7 @@
 import numpy as np
 import random as rd
+import threading
+import math
 
 
 class SingSrc:
@@ -136,8 +138,16 @@ class Simulate:
     def start_batch(self):
         self.k_track = 0
         self.k_absorb = 0
+        loop_num = math.ceil(self.mode.num_ptc / 10)
+        threads = []
         for i in range(self.mode.num_ptc):
-            self.ray_tracking(i)
+            t = threading.Thread(target=self.ray_tracking, args=(i,))
+            threads.append(t)
+        for n in range(loop_num):
+            for i1 in range(n * 10, (n+1) * 10):
+                threads[i1].start()
+            for i1 in range(n * 10, (n+1) * 10):
+                threads[i1].join()
         self.k_track = self.k_track / self.mode.num_ptc
         if not self.mode.no_absorb:
             self.k_absorb = self.k_absorb / self.mode.num_ptc
