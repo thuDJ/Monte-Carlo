@@ -21,7 +21,8 @@ class Bin:
         self.name = name
         self.para = lst
         length = len(lst)
-        self.counts = [0 for i in range(length+1)]
+        self.counts = [0 for i in range(length + 1)]
+        self.batches = []
 
     def count(self, x, sig_t):
         ll = 0
@@ -33,15 +34,37 @@ class Bin:
 
     def norm(self):
         max_num = max(self.counts)
-        counts_bk = [self.counts[i]/max_num for i in range(len(self.counts))]
+        counts_bk = [self.counts[i] / max_num for i in range(len(self.counts))]
         self.counts = counts_bk
 
     def clear(self):
-        self.counts = [0 for i in range(len(self.para)+1)]
+        self.counts = [0 for i in range(len(self.para) + 1)]
 
     def print(self):
         print(f"{self.name} counts as: ")
         print(self.counts)
+
+    def save_batch(self):
+        self.batches.append(self.counts)
+
+    def proc_batches(self):
+        f_mean = []
+        f_std = []
+        i = len(self.batches)
+        j = len(self.counts)
+        for iter_j in range(j):
+            f_lst = [self.batches[iter_i][iter_j] for iter_i in range(i)]
+            f_mean.append(np.mean(f_lst))
+            f_std.append(np.std(f_lst, ddof=1))
+        print(f_mean)
+        print(f_std)
+        return f_mean, f_std
+
+
+def proc_lst(lst):
+    arr_mean = np.mean(lst)
+    arr_std = np.std(lst, ddof=1)
+    return arr_mean, arr_std
 
 
 def get_drt():
@@ -60,6 +83,8 @@ class Simulate:
         self.src_store = []
         self.k_track = 0
         self.k_absorb = 0
+        self.ka_lst = []
+        self.kt_lst = []
         self.total_wgt = 0
         ll = range(-70, 80, 10)
         self.bin = Bin('flux', ll)
@@ -73,6 +98,8 @@ class Simulate:
         for i in range(self.mode.num_ac):
             self.start_count()
             print(f'the {i + 1} active-gen K-track is {self.k_track}, K-absorb is {self.k_absorb}')
+
+        self.proc_data()
 
     def init_source(self):
         if self.src_bank:
@@ -131,7 +158,7 @@ class Simulate:
                     killed = True
 
     def proc_cl(self, ct, mat, pos, wgt):
-        self.bin.count(pos[0], (mat.xs_a+mat.xs_s))
+        self.bin.count(pos[0], (mat.xs_a + mat.xs_s))
         if not self.mode.no_absorb:
             if ct == 1:
                 # 裂变
@@ -176,6 +203,14 @@ class Simulate:
     def start_count(self):
         self.bin.clear()
         self.start_batch()
+        self.ka_lst.append(self.k_absorb)
+        self.kt_lst.append(self.k_track)
         self.bin.norm()
-        self.bin.print()
+        self.bin.save_batch()
 
+    def proc_data(self):
+        [ka_mean, ka_std] = proc_lst(self.ka_lst)
+        [kt_mean, kt_std] = proc_lst(self.kt_lst)
+        self.bin.proc_batches()
+        print(f'the final keff-absorb is {ka_mean}, the std is {ka_std} ')
+        print(f'the final keff-track is {kt_mean}, the std is {kt_std} ')
