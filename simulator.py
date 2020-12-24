@@ -63,7 +63,7 @@ class Bin:
 
 def proc_lst(lst):
     arr_mean = np.mean(lst)
-    arr_std = np.std(lst, ddof=1) / arr_mean
+    arr_std = np.std(lst, ddof=1)
     return arr_mean, arr_std
 
 
