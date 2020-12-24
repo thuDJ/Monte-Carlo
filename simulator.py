@@ -63,7 +63,7 @@ class Bin:
 
 def proc_lst(lst):
     arr_mean = np.mean(lst)
-    arr_std = np.std(lst, ddof=1)
+    arr_std = np.std(lst, ddof=1) / arr_mean
     return arr_mean, arr_std
 
 
@@ -212,5 +212,8 @@ class Simulate:
         [ka_mean, ka_std] = proc_lst(self.ka_lst)
         [kt_mean, kt_std] = proc_lst(self.kt_lst)
         self.bin.proc_batches()
+        print(f'the k_lst is')
+        print(self.ka_lst)
+        print(self.kt_lst)
         print(f'the final keff-absorb is {ka_mean}, the std is {ka_std} ')
         print(f'the final keff-track is {kt_mean}, the std is {kt_std} ')
