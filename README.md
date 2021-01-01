@@ -1,6 +1,7 @@
-# Monte-Carlo
-@author ShenPengfei 
-@institude Tsinghua University
+# Monte-Carlo Code
+## @name PyMC
+## @author ShenPengfei 
+## @institude Tsinghua University
 
 Monte-carlo Neutron Transport Code
 
