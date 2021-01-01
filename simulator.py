@@ -56,6 +56,7 @@ class Bin:
             f_lst = [self.batches[iter_i][iter_j] for iter_i in range(i)]
             f_mean.append(np.mean(f_lst))
             f_std.append(np.std(f_lst, ddof=1))
+        f_std = [f_std[i]/len(self.batches) for i in range(len(f_std))]
         print(f_mean)
         print(f_std)
         return f_mean, f_std
@@ -215,5 +216,5 @@ class Simulate:
         print(f'the k_lst is')
         print(self.ka_lst)
         print(self.kt_lst)
-        print(f'the final keff-absorb is {ka_mean}, the std is {ka_std} ')
-        print(f'the final keff-track is {kt_mean}, the std is {kt_std} ')
+        print(f'the final keff-absorb is {ka_mean}, the std is {ka_std/np.sqrt(self.mode.num_ac)} ')
+        print(f'the final keff-track is {kt_mean}, the std is {kt_std/np.sqrt(self.mode.num_ac)} ')
